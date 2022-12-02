@@ -1,0 +1,19 @@
+#Usd car Price Predication
+import pandas as pd
+
+df=pd.read_csv(r'C:\Users\13040\OneDrive\桌面\SBU\AMS325\HW\Final Project\CAR DETAILS FROM CAR DEKHO.csv')
+
+brand="Toyota"
+name="Corolla"
+
+#create dummy variables for the df
+df=pd.get_dummies(df,prefix='', prefix_sep='',
+                  columns=['fuel','seller_type','transmission','owner'])
+#remove 1 dummy variable for each
+df=df.drop(df.columns[[4,8,13,15]], axis=1)
+
+
+#perform filtration based on car brand
+df_brand_filtered=df[df['name'].str.contains(brand)] 
+#perform filtration based on car name
+df_car_filtered=df_brand_filtered[df_brand_filtered['name'].str.contains(name)] 
