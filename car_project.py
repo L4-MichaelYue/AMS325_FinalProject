@@ -10,43 +10,57 @@ import pandas as pd
 from scipy import stats
 from collections import Counter
 
-def first_word(s):
-    s = s.strip()
-    for i in range(len(s)):
-        if s[i] == ' ':
-            return s[:i]
-    return s
+def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
 
-df_car = pd.read_csv("CAR DETAILS FROM CAR DEKHO.csv")
+    def first_word(s):
+        s = s.strip()
+        for i in range(len(s)):
+            if s[i] == ' ':
+                return s[:i]
+        return s
 
-df_car['first'] = df_car.name.apply(first_word)
-df_car['year'] = 2022 - df_car.year
+    df_car = pd.read_csv("CAR DETAILS FROM CAR DEKHO.csv")
 
-df = df_car[df_car['first'] == 'Maruti']
+    input_name = name
 
-df_fuel = pd.get_dummies(df.fuel)
-df_seller = pd.get_dummies(df.seller_type)
-df_transmission = pd.get_dummies(df.transmission)
-df_age = df.year 
-df_km_driven = df.km_driven
+    name = first_word(input_name)
 
-df_data = pd.concat([df_fuel,df_seller,df_transmission,df_age], axis=1, join='inner')
+    df_car['first'] = df_car.name.apply(first_word)
+    df_car['year'] = 2022 - df_car.year
 
-X = df_data
+    df = df_car[df_car['first'] == name]
 
-y = np.log(df.selling_price)
+    df_fuel = pd.get_dummies(df.fuel)
+    df_seller = pd.get_dummies(df.seller_type)
+    df_transmission = pd.get_dummies(df.transmission)
+    df_owner = pd.get_dummies(df.owner)
+    df_age = df.year 
+    df_km_driven = df.km_driven
 
-print(y)
+    df_data = pd.concat([df_fuel,df_seller,df_transmission,df_age,df_owner,df_km_driven], axis=1, join='inner')
 
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y,train_size = 0.7)
+    X = df_data
 
-model = linear_model.LinearRegression()
-model.fit(X_train, y_train)
+    y = np.log(df.selling_price)
 
-print(model.score(X_train, y_train))
+    # print(y)
 
-print(model.score(X_test, y_test))
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y,train_size = 0.7)
 
-model = smf.ols('y~df_fuel+df_seller+df_transmission+df_age+df_km_driven', df_data)
-result = model.fit()
-print(result.summary())
+    model = linear_model.LinearRegression()
+    model.fit(X, y)
+
+    df2 = X[0:0].copy()
+    dict = {"km_driven": km_driven,
+                        fuel: 1,
+                        seller_type: 1,
+                        transmission:1,
+                        owner:1,
+                        'year':age
+                        }
+    df2 = df2.append(dict,ignore_index=True)
+    df2 = df2.fillna(0)
+    s = model.predict(df2)
+    return(np.exp(s))
+
+print(estimate('Maruti Wagon R LXI Minor',15,50000,'Petrol','Individual','Manual','First Owner'))
