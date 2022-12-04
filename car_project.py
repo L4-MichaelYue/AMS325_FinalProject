@@ -1,19 +1,12 @@
-import statsmodels.api as sm 
-import statsmodels.formula.api as smf
-import statsmodels.graphics.api as smg
 from sklearn import model_selection  
 from sklearn import linear_model
-import patsy
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy import stats
-from collections import Counter
 import sys
 import tkinter as Tk
 
 def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
-
+    #clean data
     def first_word(s):
         s = s.strip()
         for i in range(len(s)):
@@ -31,8 +24,22 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     df_car['year'] = 2022 - df_car.year
 
     df = df_car[df_car['first'] == name]
-    if len(df) < 5:
+    #detect errors
+    if len(df) < 20:
         return "Not enough data for this name"
+    if int(age) <0:
+        return "Age can't be negative"
+    if int(km_driven) <0:
+        return "km driven can't be negative"
+    if len(df[df['fuel'] == fuel]) == 0:
+        return "No data for this fuel"
+    if len(df[df['seller_type'] == seller_type]) == 0:
+        return "No data for this seller_type"
+    if len(df[df['transmission'] == transmission]) == 0:
+        return "No data for this transmission"
+    if len(df[df['owner'] == owner]) == 0:
+        return "No data for this owner"
+    #get dummy
     df_fuel = pd.get_dummies(df.fuel)
     df_seller = pd.get_dummies(df.seller_type)
     df_transmission = pd.get_dummies(df.transmission)
@@ -61,8 +68,6 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
                         }
     df2 = df2.append(dict,ignore_index=True)
     df2 = df2.fillna(0)
-    if len(df2.columns) != len(X.columns):
-        return "Can't find this type"
     s = np.exp(model.predict(df2))
     return('The estimate value is %d' %s)
 
