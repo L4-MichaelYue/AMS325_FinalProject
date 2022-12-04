@@ -10,9 +10,9 @@ def price_prediction(brand, model, year, km_driven, fuel, seller_type, transmiss
 
     #create dummy variables for the df
     df=pd.get_dummies(df,prefix='', prefix_sep='',
-                      columns=['fuel','seller_type','transmission','owner'])
+                      columns=['fuel','seller_type','transmission','owner'],drop_first=True)
     #remove 1 dummy variable for each
-    df=df.drop(df.columns[[4,8,13,17]], axis=1)
+    #df=df.drop(df.columns[[4,8,13,17]], axis=1)
 
 
     ###
