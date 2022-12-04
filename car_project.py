@@ -40,10 +40,10 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     if len(df[df['owner'] == owner]) == 0:
         return "No data for this owner"
     #get dummy
-    df_fuel = pd.get_dummies(df.fuel)
-    df_seller = pd.get_dummies(df.seller_type)
-    df_transmission = pd.get_dummies(df.transmission)
-    df_owner = pd.get_dummies(df.owner)
+    df_fuel = pd.get_dummies(df.fuel,drop_first=True)
+    df_seller = pd.get_dummies(df.seller_type,drop_first=True)
+    df_transmission = pd.get_dummies(df.transmission,drop_first=True)
+    df_owner = pd.get_dummies(df.owner,drop_first=True)
     df_age = df.year 
     df_km_driven = df.km_driven
 
@@ -52,20 +52,28 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     X = df_data
 
     y = np.log(df.selling_price)
-
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y,train_size = 0.7)
+    # it was test for whether model make sense
+    # X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y,train_size = 0.7)
 
     model = linear_model.LinearRegression()
     model.fit(X, y)
 
     df2 = X[0:0].copy()
     dict = {"km_driven": km_driven,
-                        fuel: 1,
-                        seller_type: 1,
-                        transmission:1,
-                        owner:1,
+                        # fuel: 1,
+                        # seller_type: 1,
+                        # transmission:1,
+                        # owner:1,
                         'year':age
                         }
+    if fuel in df2.columns:
+        dict[fuel] = 1
+    if seller_type in df2.columns:
+        dict[seller_type] = 1
+    if transmission in df2.columns:
+        dict[transmission] = 1
+    if owner in df2.columns:
+        dict[owner] = 1
     df2 = df2.append(dict,ignore_index=True)
     df2 = df2.fillna(0)
     s = np.exp(model.predict(df2))
