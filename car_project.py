@@ -1,9 +1,8 @@
-from sklearn import model_selection  
 from sklearn import linear_model
 import numpy as np
 import pandas as pd
-import sys
 import tkinter as Tk
+import datetime
 
 def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     #clean data
@@ -16,11 +15,11 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
 
     df_car = pd.read_csv("CAR DETAILS FROM CAR DEKHO.csv")
 
-    input_name = name
-
-    name = first_word(input_name)
+    name = first_word(name)
 
     df_car['first'] = df_car.name.apply(first_word)
+    now = datetime.datetime.now().year
+    age = now - int(age)
     df_car['year'] = 2022 - df_car.year
 
     df = df_car[df_car['first'] == name]
@@ -28,7 +27,7 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     if len(df) < 20:
         return "Not enough data for this name"
     if int(age) <0:
-        return "Age can't be negative"
+        return "Can't have future car"
     if int(km_driven) <0:
         return "km driven can't be negative"
     if len(df[df['fuel'] == fuel]) == 0:
@@ -76,8 +75,8 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
         dict[owner] = 1
     df2 = df2.append(dict,ignore_index=True)
     df2 = df2.fillna(0)
-    s = 0.012*np.exp(model.predict(df2))
-    return('The estimate value is %d' %s)
+    s = np.exp(model.predict(df2))
+    return('The estimate value is %d Rupees, which equal to %d dollars' %(s,0.012*s))
 
 class Response:
     def __init__(self, parent, main_obj):
@@ -88,7 +87,7 @@ class Response:
         self.frame.pack(fill=Tk.BOTH, expand=1)
         
         name = self.main_obj.field_name.get()
-        age = self.main_obj.field_age.get()
+        age = self.main_obj.field_year.get()
         km_driven = self.main_obj.field_km_driven.get()
         fuel = self.main_obj.field_fuel.get()
         seller_type = self.main_obj.field_seller_type.get()
@@ -123,17 +122,17 @@ class MyGUI2:
         
         self.field_name = Tk.Entry(self.frame_name, textvariable=self.label_str)
         self.field_name.grid(row=0, column=1, sticky=Tk.W)
-        #age
-        self.frame_age = Tk.Frame(self.parent)
-        self.frame_age.pack(fill=Tk.BOTH, expand=1)                                                                        
+        #year
+        self.frame_year = Tk.Frame(self.parent)
+        self.frame_year.pack(fill=Tk.BOTH, expand=1)                                                                        
         
-        self.label_age = Tk.Label(self.frame_age, text="age")
-        self.label_age.grid(row=1, column=0, sticky=Tk.W)
+        self.label_year = Tk.Label(self.frame_year, text="year")
+        self.label_year.grid(row=1, column=0, sticky=Tk.W)
         
         self.label_str = Tk.StringVar()
         
-        self.field_age = Tk.Entry(self.frame_age, textvariable=self.label_str)
-        self.field_age.grid(row=1, column=1, sticky=Tk.W)
+        self.field_year = Tk.Entry(self.frame_year, textvariable=self.label_str)
+        self.field_year.grid(row=1, column=1, sticky=Tk.W)
         #km_driven
         self.frame_km_driven = Tk.Frame(self.parent)
         self.frame_km_driven.pack(fill=Tk.BOTH, expand=1)                                                                        
