@@ -76,7 +76,7 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
         dict[owner] = 1
     df2 = df2.append(dict,ignore_index=True)
     df2 = df2.fillna(0)
-    s = np.exp(model.predict(df2))
+    s = 0.012*np.exp(model.predict(df2))
     return('The estimate value is %d' %s)
 
 class Response:
