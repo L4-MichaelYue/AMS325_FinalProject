@@ -13,7 +13,7 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
                 return s[:i]
         return s
 
-    df_car = pd.read_csv("CAR DETAILS FROM CAR DEKHO.csv")
+    df_car = pd.read_csv("CAR DETAILS FROM CAR DEKHO(1).csv")
 
     name = first_word(name)
 
@@ -76,7 +76,7 @@ def estimate(name,age,km_driven,fuel,seller_type,transmission,owner):
     df2 = df2.append(dict,ignore_index=True)
     df2 = df2.fillna(0)
     s = np.exp(model.predict(df2))
-    return('The estimate value is %d dollars' %(0.012*s))
+    return('The estimate value is %d dollars' %(s))
 
 class Response:
     def __init__(self, parent, main_obj):
